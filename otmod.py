@@ -73,27 +73,37 @@ def main(arguments):
     args = Argument(arguments)
 
     # Command line syntax
+    # LONG OPTIONS: otmod.py --in <font infile path> --opentype <Open Type changes YAML path> --out <font outfile path>
+    # SHORT OPTIONS: otmod.py -i <font infile path> -t <Open Type changes YAML path> -o <font outfile path>
 
     # font infile path
     if "--in" in args.argv:
         infile = args.get_arg_next(args.get_arg_position("--in"))
         if infile is "":
-            sys.stderr.write("[otmod.py] ERROR: please define the font input file path as an argument to the --in command line flag.\n")
+            sys.stderr.write("[otmod.py] ERROR: please define the font input file path as an argument to the --in command line option.\n")
             sys.exit(1)
     elif "-i" in args.argv:
         infile = args.get_arg_next(args.get_arg_position("-i"))
         if infile is "":
-            sys.stderr.write("[otmod.py] ERROR: please define the font input file path as an argument to the -i command line flag.\n")
+            sys.stderr.write("[otmod.py] ERROR: please define the font input file path as an argument to the -i command line option.\n")
             sys.exit(1)
     else:
-        sys.stderr.write("[otmod.py] ERROR: Please include the `--in` flag with an input font file defined as an argument.\n")
+        sys.stderr.write("[otmod.py] ERROR: Please include the `--in` option with an input font file defined as an argument.\n")
         sys.exit(1)
 
     # OpenType change YAML file path
     if "--opentype" in args.argv:
-        print("opentype")
+        otpath = args.get_arg_next(args.get_arg_position("--opentype"))
+        if otpath is "":
+            sys.stderr.write("[otmod.py] ERROR: please define the YAML OpenType changes file path as an argument to the --opentype command line option.\n")
+            sys.exit(1)
+    elif "-t" in args.argv:
+        otpath = args.get_arg_next(args.get_arg_position("-t"))
+        if otpath is "":
+            sys.stderr.write("[otmod.py] ERROR: please define the YAML OpenType changes file path as an argument to the -t command line option.\n")
+            sys.exit(1)
     else:
-        sys.stderr.write("[otmod.py] ERROR: Please include the `--opentype` flag and define it with an path argument to the YAML formatted OpenType changes file.\n")
+        sys.stderr.write("[otmod.py] ERROR: Please include the `--opentype` option and define it with an path argument to the YAML formatted OpenType changes file.\n")
         sys.exit(1)
 
     # font outfile path (allows for font name change in outfile)
