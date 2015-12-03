@@ -50,7 +50,7 @@ class Argument(list):
 
 def read_utf8(filepath):
     """read_utf8() is a function that reads text in as UTF-8 NFKD normalized text strings from filepath
-    :param filepath:
+    :param filepath: the filepath to the text input file
     """
     try:
         import codecs
@@ -81,7 +81,7 @@ def main(arguments):
             sys.stderr.write("[otmod.py] ERROR: please define the font input file path as an argument to the --in command line flag.\n")
             sys.exit(1)
     elif "-i" in args.argv:
-        infile = args.get_arg_next("-i")
+        infile = args.get_arg_next(args.get_arg_position("-i"))
         if infile is "":
             sys.stderr.write("[otmod.py] ERROR: please define the font input file path as an argument to the -i command line flag.\n")
             sys.exit(1)
