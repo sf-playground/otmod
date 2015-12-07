@@ -1,7 +1,7 @@
 head:
     lowestRecPPEM: 6
-    unitsPerEm: 2048
+    unitsPerEm: 2050
 
 OS/2:
-    sTypoDescender: -492
-    sTypoLineGap: 410
+    sTypoDescender: -480
+    sTypoLineGap: 390
