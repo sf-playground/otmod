@@ -64,7 +64,6 @@ def read_utf8(filepath):
     :param filepath: the filepath to the text input file
     """
     try:
-        import codecs
         f = codecs.open(filepath, encoding='utf_8', mode='r')
     except IOError as ioe:
         sys.stderr.write("[otmod.py] ERROR: Unable to open '" + filepath + "' for read.\n")
@@ -83,7 +82,7 @@ def read_utf8(filepath):
 def main(arguments):
     args = Argument(arguments)
 
-    # Command line syntax
+    # Command line syntax + parsing
     # LONG OPTIONS: otmod.py --in <font infile path> --opentype <Open Type changes YAML path> --out <font outfile path>
     # SHORT OPTIONS: otmod.py -i <font infile path> -t <Open Type changes YAML path> -o <font outfile path>
 
@@ -129,6 +128,19 @@ def main(arguments):
     else:
         outfile = generate_outfile_path(infile)
 
+    # Test for existing file paths
+    if not os.path.isfile(infile):
+        sys.stderr.write("[otmod.py] ERROR: Unable to locate font at the infile path '" + infile + "'.\n")
+        sys.exit(1)
+    if not os.path.isfile(otpath):
+        sys.stderr.write("[otmod.py] ERROR: Unable to locate the OpenType modification settings YAML file at '" + otpath + "'.\n")
+        sys.exit(1)
+
+    # Read in YAML file and convert to Python object
+    try:
+        pass
+    except Exception as e:
+        pass
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
