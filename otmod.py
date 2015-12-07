@@ -8,6 +8,7 @@
 #  ------------------------------------------------------------------------------
 
 import sys
+import os.path
 import codecs
 import unicodedata
 import fontTools
@@ -46,6 +47,16 @@ class Argument(list):
             return self.argv[position + 1]
         else:
             return ""
+
+
+def generate_outfile_path(filepath):
+    filepath_list = os.path.split(filepath)
+    directory_path = filepath_list[0]
+    basefile_path = filepath_list[1]
+    basefile_list = basefile_path.split(".")
+    new_basefile_name = basefile_list[0] + "-new." + basefile_list[1]
+    outfile = os.path.join(directory_path, new_basefile_name)
+    return outfile
 
 
 def read_utf8(filepath):
@@ -108,7 +119,16 @@ def main(arguments):
 
     # font outfile path (allows for font name change in outfile)
     if "--out" in args.argv:
-        print("out")
+        outfile = args.get_arg_next(args.get_arg_position("--out"))
+        if outfile is "":
+            outfile = generate_outfile_path(infile)
+    elif "-o" in args.argv:
+        outfile = args.get_arg_next(args.get_arg_position("-o"))
+        if outfile is "":
+            outfile = generate_outfile_path(infile)
+    else:
+        outfile = generate_outfile_path(infile)
+
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
