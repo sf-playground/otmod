@@ -11,7 +11,7 @@ import sys
 import os.path
 import codecs
 import unicodedata
-import fontTools
+from fontTools import ttLib
 from yaml import load
 try:
     from yaml import CLoader as Loader
@@ -143,10 +143,39 @@ def main(arguments):
     # Read YAML OT table changes settings file and convert to Python object
     try:
         yaml_text = read_utf8(otpath)
-        otmods = load(yaml_text, Loader=Loader)
-        print(otmods)
+        # Python dictionary definitions with structure `otmods_obj['OS/2']['sTypoLineGap']`
+        otmods_obj = load(yaml_text, Loader=Loader)
     except Exception as e:
         sys.stderr.write("[otmod.py] ERROR: There was an error during the attempt to parse the YAML file. " + str(e) + "\n")
+        sys.exit(1)
+
+    # Read font infile and create a fontTools OT table object
+    try:
+        tt = ttLib.TTFont(infile)
+    except Exception as e:
+        sys.stderr.write("[otmod.py] ERROR: There was an error during the attempt to parse the OpenType tables in the font file '" + infile + "'. " + str(e) + "\n")
+        sys.exit(1)
+
+    # iterate through OT tables in the Python fonttools OT table object
+    for ot_table in otmods_obj:
+        # Confirm that the requested table name for a change is an actual table in the font
+        if ot_table in tt.keys():
+            # iterate through the items that require modification in the table
+            for field in otmods_obj[ot_table]:
+                # confirm that the field exists in the existing font table
+                if field in tt[ot_table].__dict__.keys():
+                    # modify the field definition in memory
+                    tt[ot_table].__dict__[field] = otmods_obj[ot_table][field]
+                else:
+                    print("[otmod.py] WARNING: '" + ot_table + "' table field '" + field + "' was not a table found in the font '" + infile + "'.  No change was made to this table field.")
+        else:
+            print("[otmod.py] WARNING: '" + ot_table + "' was not a table found in the font '" + infile + "'.  No change was made to this table.")
+
+    # Write updated font to disk
+    try:
+        tt.save(outfile)
+    except Exception as e:
+        sys.stderr.write("[otmod.py] ERROR: There was an error during the attempt to write the file '" + outfile + "' to disk. " + str(e) + "\n")
         sys.exit(1)
 
 
