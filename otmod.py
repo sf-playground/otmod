@@ -87,8 +87,13 @@ def main(arguments):
     args = Argument(arguments)
 
     # Command line syntax + parsing
-    # LONG OPTIONS: otmod.py --in <font infile path> --opentype <Open Type changes YAML path> --out <font outfile path>
-    # SHORT OPTIONS: otmod.py -i <font infile path> -t <Open Type changes YAML path> -o <font outfile path>
+    # LONG OPTIONS: otmod.py --in <font infile path> --opentype <Open Type changes YAML path> --out <font outfile path> --quiet
+    # SHORT OPTIONS: otmod.py -i <font infile path> -t <Open Type changes YAML path> -o <font outfile path> -q
+
+    # Quiet flag (default to False, if set to True does not print changes that occurred to std output)
+    quiet = False
+    if "--quiet" in args.argv or "-q" in args.argv:
+        quiet = True
 
     # font infile path
     if "--in" in args.argv:
@@ -166,6 +171,9 @@ def main(arguments):
                 if field in tt[ot_table].__dict__.keys():
                     # modify the field definition in memory
                     tt[ot_table].__dict__[field] = otmods_obj[ot_table][field]
+                    # notify user if quiet flag is not set
+                    if not quiet:
+                        print("(" + infile + ")[" + ot_table + "][" + field + "] changed to " + str(tt[ot_table].__dict__[field]))
                 else:
                     print("[otmod.py] WARNING: '" + ot_table + "' table field '" + field + "' was not a table found in the font '" + infile + "'.  No change was made to this table field.")
         else:
@@ -174,6 +182,8 @@ def main(arguments):
     # Write updated font to disk
     try:
         tt.save(outfile)
+        if not quiet:
+            print("[otmod.py] '" + infile + "' was updated and the new font write took place on the path '" + outfile + "'.")
     except Exception as e:
         sys.stderr.write("[otmod.py] ERROR: There was an error during the attempt to write the file '" + outfile + "' to disk. " + str(e) + "\n")
         sys.exit(1)
