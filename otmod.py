@@ -12,7 +12,11 @@ import os.path
 import codecs
 import unicodedata
 import fontTools
-import yaml
+from yaml import load
+try:
+    from yaml import CLoader as Loader
+except ImportError:
+    from yaml import Loader
 
 
 # ------------------------------------------------------------------------------
@@ -136,11 +140,15 @@ def main(arguments):
         sys.stderr.write("[otmod.py] ERROR: Unable to locate the OpenType modification settings YAML file at '" + otpath + "'.\n")
         sys.exit(1)
 
-    # Read in YAML file and convert to Python object
+    # Read YAML OT table changes settings file and convert to Python object
     try:
-        pass
+        yaml_text = read_utf8(otpath)
+        otmods = load(yaml_text, Loader=Loader)
+        print(otmods)
     except Exception as e:
-        pass
+        sys.stderr.write("[otmod.py] ERROR: There was an error during the attempt to parse the YAML file. " + str(e) + "\n")
+        sys.exit(1)
+
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
